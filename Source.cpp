@@ -1,6 +1,7 @@
 #include <iostream>
 #include <windows.h>
 #include <math.h>
+#include <string>
 using namespace std;
 
 class TowerOfHanoiGame
@@ -226,6 +227,65 @@ void solution(int n, char from_rod, char to_rod, char aux_rod)  // function whic
 }
 
 
+// queue to save moves in hanoi game as string
+class Queue
+{
+private:
+	struct Node
+	{
+		string data;
+		Node* next;
+	};
+	Node* front;
+	Node* rear;
+	int size;
+public:
+	Queue()
+	{
+		front = NULL;
+		rear = NULL;
+		size = 0;
+	}
+	void enqueue(string data)
+	{
+		Node* newNode = new Node;
+		newNode->data = data;
+		newNode->next = NULL;
+		if (front == NULL)
+		{
+			front = newNode;
+			rear = newNode;
+		}
+		else
+		{
+			rear->next = newNode;
+			rear = newNode;
+		}
+		size++;
+	}
+	string dequeue()
+	{
+		if (front == NULL)
+		{
+			return "";
+		}
+		else
+		{
+			Node* temp = front;
+			front = front->next;
+			string data = temp->data;
+			delete temp;
+			size--;
+			return data;
+		}
+	}
+	int getSize()
+	{
+		return size;
+	}
+};
+
+
 void playGame()   //function which specify how the game is played
 {
 	TH.resetGame();
@@ -233,6 +293,10 @@ void playGame()   //function which specify how the game is played
 	char source;
 	char dest;
 	int invalidCheck;
+	// Queue to save moves in hanoi game
+	Queue q;
+	
+	
 	while (flag == false)
 	{
 		system("CLS");
@@ -274,8 +338,17 @@ void playGame()   //function which specify how the game is played
 		else
 		{
 			TowerOfHanoiGame::moves = TowerOfHanoiGame::moves + 1;
+			// add move played to queue as string with current disk number
+			string move = "Moved a disk from rod ";
+			move.append(1, source);
+			move.append(" to rod ");
+			move.append(1, dest);
+			q.enqueue(move);
+			
 
 		}
+		
+
 		if (TowerOfHanoiGame::moves > (pow(2, TH.size) + 3))
 		{
 			cout << "------------------Game Over!------------------" << endl;
@@ -308,7 +381,14 @@ void playGame()   //function which specify how the game is played
 				}
 				else
 				{
+					// print all moves in queue
+					cout << "All moves played in the game are:" << endl;
+					while (q.getSize() != 0)
+					{
+						cout << q.dequeue() << endl;
+					}
 					exit(0);
+
 				}
 
 			}
@@ -319,6 +399,11 @@ void playGame()   //function which specify how the game is played
 	TH.display();
 	cout << "Total Moves:\t" << TowerOfHanoiGame::moves;
 	cout << "\nCongrats! You Solve The Tower of Hanoi Puzzle in " << TowerOfHanoiGame::moves << " moves\n";
+	cout << "All moves played in the game are:" << endl;
+	while (q.getSize() != 0)
+	{
+		cout << q.dequeue() << endl;
+	}
 	system("pause");
 }
 
